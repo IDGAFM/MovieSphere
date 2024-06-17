@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/genre.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container-two">
+        <div class="main-title">
+            Жанры
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="janre">
+            <div class="block-janre">
+                {% for genre in genres %}
+                    <div class="janre-image">
+                        <a href="{% url 'movies' %}?genre={{ genre.name }}">
+                            <img src="{{ genre.image.url }}" alt="{{ genre.name }}">
+                            <div class="janre-text">
+                                {{ genre.name }}
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+<div class="pagination">
+    {% if is_paginated %}
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li><a href="?page={{ page_obj.previous_page_number }}{% if request.GET.genre %}&genre={{ request.GET.genre }}{% endif %}">Previous</a></li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li><strong>{{ num }}</strong></li>
+                {% elif num > page_obj.number|add:-5 and num < page_obj.number|add:5 %}
+                    <li><a href="?page={{ num }}{% if request.GET.genre %}&genre={{ request.GET.genre }}{% endif %}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li><a href="?page={{ page_obj.next_page_number }}{% if request.GET.genre %}&genre={{ request.GET.genre }}{% endif %}">Next</a></li>
+            {% endif %}
+        </ul>
+    {% endif %}
+</div>
+
+
+{% endblock %}

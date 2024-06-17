@@ -1,0 +1,426 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="block-title-film" id="preview-block" style="background-image: url({{ current_movie.preview_poster.url }});">
+    <div class="container">
+        <div class="preview-title">
+            <span id="preview-title">{{ current_movie.title }}</span>
+        </div>
+        <div id="preview-desc" class="preview-desc">
+            {{ current_movie.description|truncatewords:60 }}
+        </div>
+        <div class="buttons">
+            <button class="preview-trailer-btn">Смотреть трейлер</button>
+            <button class="preview-film-btn">Смотреть фильм</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="janre">
+        <div class="janre-link">
+            <a href="{% url 'genre_list' %}">Жанры <img src="{% static 'images/vektor-right.png' %}" alt=""></a>
+        </div>
+        <div class="block-janre">
+            {% for genre in genres %}
+            <a href="{% url 'movies' %}?genre={{ genre.name }}">
+                <div class="janre-image">
+                    <img src="{{ genre.image.url }}" alt="{{ genre.name }}">
+                    <div class="janre-text">
+                        {{ genre.name }}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="popularity">
+        <div class="popularity-link">
+            <a href="{% url 'popularity' %}">Популярно сейчас <img src="{% static 'images/vektor-right.png' %}" alt=""></a>
+        </div>
+        {% for movie in popular_movies %}
+        <div class="popularity-info">
+            <div class="popularity-images">
+                <a href="{{ movie.get_absolute_url }}">
+                    <img src="{{ movie.poster.url }}" alt="">
+                </a>
+                <div class="popularity-title">
+                    <div class="popul-film-title">
+                        <a href="{{ movie.get_absolute_url }}">
+                            {{ movie.title }}
+                        </a>
+                    </div>
+                    <div class="popul-janre">
+                        {% for genre in movie.genre.all %}
+                        <li>{{ genre.name }}</li>
+                        {% endfor %}
+                    </div>
+                    <div class="popul-year">
+                        {{ movie.year }}
+                    </div>
+                </div>
+            </div>
+            <div class="popularity-desc">
+                {{ movie.description }}
+            </div>
+            <div class="popularity-rating">
+                {% if movie.rating_set.count > 0 %}
+                <div class="rating-num">
+                    {{ movie.average_rating }}
+                </div>
+                {% else %}
+                <div class="rating-num-none">
+                    Нет оценок
+                </div>
+                {% endif %}
+                <div class="rating-quantity">
+                    {{ movie.rating_set.count }} <br>
+                    Оценок
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="redaction">
+        <div class="redaction-link">
+            <a href="{% url 'editors_choice' %}">Выбор редакции <img src="{% static 'images/vektor-right.png' %}" alt=""></a>
+        </div>
+        <div class="redaction-big-block">
+        {% for movie in editors_choice_movies %}
+            <div class="redaction-block">
+                <a href="{{ movie.get_absolute_url }}">
+                    <img src="{{ movie.poster.url }}" alt="{{ movie.title }}">
+                    <div class="redaction-title">
+                        {{ movie.title }}
+                    </div>
+                </a>
+                <div class="redaction-janre">
+                    <p>{{ movie.year }}<br>
+                        <span>{% for genre in movie.genre.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+                    </p>
+                </div>
+                <div class="redaction-desc">
+                    {{ movie.description|truncatewords:20 }}
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+<div class="popup-movie" id="trailer-popup">
+    <div class="container-trailer show-controls">
+        <div class="wrapper-trailer">
+            <span class="close">&times;</span>
+            <div class="video-timeline-trailer">
+                <div class="progress-area-trailer">
+                    <span>00:00</span>
+                    <div class="progress-bar-trailer"></div>
+                </div>
+            </div>
+            <ul class="video-controls-trailer">
+                <li class="options-trailer left">
+                    <button class="volume"><i class="fa-solid fa-volume-high"></i></button>
+                    <input type="range" min="0" max="1" step="any">
+                    <div class="video-timer-trailer">
+                        <p class="current-time">00:00</p>
+                        <p class="separator"> / </p>
+                        <p class="video-duration">00:00</p>
+                    </div>
+                </li>
+                <li class="options-trailer">
+                    <button class="skip-backward"><i class="fas fa-backward"></i></button>
+                    <button class="play-pause"><i class="fas fa-play"></i></button>
+                    <button class="skip-forward"><i class="fas fa-forward"></i></button>
+                </li>
+                <li class="options-trailer right">
+                    <div class="playback-content-trailer">
+                        <button class="playback-speed"><span class="material-symbols-rounded">slow_motion_video</span></button>
+                        <ul class="speed-options-trailer">
+                            <li data-speed="2">2x</li>
+                            <li data-speed="1.5">1.5x</li>
+                            <li data-speed="1" class="active">Normal</li>
+                            <li data-speed="0.75">0.75x</li>
+                            <li data-speed="0.5">0.5x</li>
+                        </ul>
+                    </div>
+                    <button class="pic-in-pic"><span class="material-icons">picture_in_picture_alt</span></button>
+                    <button class="fullscreen"><i class="fa-solid fa-expand"></i></button>
+                </li>
+            </ul>
+        </div>
+        <video class="tr" id="main-video-tr"  src="{{ trailer_url }}" controls></video>
+    </div>
+</div>
+
+<div class="popup-movie" id="film-popup">
+    <div class="containerr show-controls">
+        <div class="wrapper">
+            <span class="close">&times;</span>
+            <div class="video-timeline">
+                <div class="progress-area">
+                    <span>00:00</span>
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+            <ul class="video-controls">
+                <li class="options left">
+                    <button class="volume"><i class="fa-solid fa-volume-high"></i></button>
+                    <input type="range" min="0" max="1" step="any">
+                    <div class="video-timer">
+                        <p class="current-time">00:00</p>
+                        <p class="separator"> / </p>
+                        <p class="video-duration">00:00</p>
+                    </div>
+                </li>
+                <li class="options">
+                    <button class="skip-backward"><i class="fas fa-backward"></i></button>
+                    <button class="play-pause"><i class="fas fa-play"></i></button>
+                    <button class="skip-forward"><i class="fas fa-forward"></i></button>
+                </li>
+                <li class="options right">
+                    <div class="playback-content">
+                        <button class="playback-speed"><span class="material-symbols-rounded">slow_motion_video</span></button>
+                        <ul class="speed-options">
+                            <li data-speed="2">2x</li>
+                            <li data-speed="1.5">1.5x</li>
+                            <li data-speed="1" class="active">Normal</li>
+                            <li data-speed="0.75">0.75x</li>
+                            <li data-speed="0.5">0.5x</li>
+                        </ul>
+                    </div>
+                    <button class="pic-in-pic"><span class="material-icons">picture_in_picture_alt</span></button>
+                    <button class="fullscreen"><i class="fa-solid fa-expand"></i></button>
+                </li>
+            </ul>
+        </div>
+            <video class="film-play" id="main-video" src="{% if current_episode %}{{ current_episode.video.url }}{% else %}{{ current_movie.movie_file.url }}{% endif %}" controls></video>        <div class="series-info">
+            {% if current_season %}
+                <span>Сезон: {{ current_season.season_number }}</span>
+            {% else %}
+                <span>Сезон не выбран</span>
+            {% endif %}
+            {% if current_episode %}
+                <span>Серия: {{ current_episode.episode_number }}</span>
+            {% else %}
+                <span>Серия не выбрана</span>
+            {% endif %}
+        </div>
+        <div class="series-selector-container">
+            <div class="series-selector">
+                <select id="season-select">
+                    {% for season in movie.seasons.all %}
+                        <option value="{{ season.season_number }}" {% if season == current_season %}selected{% endif %}>
+                            Сезон {{ season.season_number }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <select id="episode-select">
+                    {% if current_season %}
+                        {% for episode in current_season.episodes.all %}
+                            <option value="{{ episode.episode_number }}" {% if episode == current_episode %}selected{% endif %}>
+                                Серия {{ episode.episode_number }}
+                            </option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="">Сначала выберите сезон</option>
+                    {% endif %}
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'javascript/movies.js' %}"></script>
+<script src="{% static 'javascript/pl-tr-index.js' %}"></script>
+<script src="{% static 'javascript/pl-fun.js' %}"></script>
+<script src="{% static 'javascript/pl-index.js' %}"></script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const previewBlock = document.getElementById('preview-block');
+    const previewTitle = document.getElementById('preview-title');
+    const previewDesc = document.getElementById('preview-desc');
+    const previewTrailerBtn = document.querySelector('.preview-trailer-btn');
+    const previewFilmBtn = document.querySelector('.preview-film-btn');
+    const mainVideo = document.getElementById('main-video');
+    const trailerVideo = document.getElementById('main-video-tr');
+    const seriesInfo = document.querySelector('.series-info');
+    const seriesSelectorContainer = document.querySelector('.series-selector-container');
+    const seasonSelect = document.getElementById('season-select');
+    const episodeSelect = document.getElementById('episode-select');
+    const seasonInfo = document.querySelector('.series-info span:nth-child(1)');
+    const episodeInfo = document.querySelector('.series-info span:nth-child(2)');
+    let intervalId;
+
+    // Function to truncate text to a specified number of words
+    function truncateWords(text, numWords) {
+        const words = text.split(' ');
+        if (words.length > numWords) {
+            return words.slice(0, numWords).join(' ') + '...';
+        }
+        return text;
+    }
+
+    // Helper function to remove a class and then re-add it after a delay
+    function restartAnimation(element, className) {
+        element.classList.remove(className);
+        void element.offsetWidth; // Trigger reflow
+        element.classList.add(className);
+    }
+
+    // Update the preview block content
+    function updatePreviewBlock(movieData) {
+        previewBlock.classList.add('fade-out-left');
+
+        setTimeout(() => {
+            previewTitle.textContent = movieData.title;
+            previewDesc.textContent = truncateWords(movieData.description, 40); // Truncate description to 60 words
+            previewBlock.style.backgroundImage = `url(${movieData.preview_poster})`;
+            mainVideo.src = movieData.is_series ? '' : (movieData.movie_url ? movieData.movie_url : '');
+            trailerVideo.src = movieData.trailer_url ? movieData.trailer_url : '';
+
+            if (movieData.is_series) {
+                seriesInfo.style.display = 'block';
+                seriesSelectorContainer.style.display = 'block';
+
+                seasonInfo.textContent = `Сезон: ${movieData.seasons[0].season_number}`;
+                episodeInfo.textContent = `Серия: ${movieData.seasons[0].episodes[0].episode_number}`;
+
+                seasonSelect.innerHTML = '';
+                episodeSelect.innerHTML = '';
+
+                movieData.seasons.forEach((season, seasonIndex) => {
+                    const seasonOption = document.createElement('option');
+                    seasonOption.value = seasonIndex;
+                    seasonOption.textContent = `Сезон ${season.season_number}`;
+                    seasonSelect.appendChild(seasonOption);
+                });
+
+                const updateEpisodeOptions = (seasonIndex) => {
+                    const selectedSeason = movieData.seasons[seasonIndex];
+                    episodeSelect.innerHTML = '';
+                    selectedSeason.episodes.forEach((episode, episodeIndex) => {
+                        const episodeOption = document.createElement('option');
+                        episodeOption.value = episodeIndex;
+                        episodeOption.textContent = `Серия ${episode.episode_number}`;
+                        episodeSelect.appendChild(episodeOption);
+                    });
+                    episodeSelect.dispatchEvent(new Event('change'));
+                };
+
+                seasonSelect.addEventListener('change', function() {
+                    const selectedSeasonIndex = seasonSelect.value;
+                    updateEpisodeOptions(selectedSeasonIndex);
+                });
+
+                episodeSelect.addEventListener('change', function() {
+                    const selectedSeasonIndex = seasonSelect.value;
+                    const selectedEpisodeIndex = episodeSelect.value;
+                    const selectedSeason = movieData.seasons[selectedSeasonIndex];
+                    const selectedEpisode = selectedSeason.episodes[selectedEpisodeIndex];
+                    mainVideo.src = selectedEpisode.video_url;
+                    seasonInfo.textContent = `Сезон: ${selectedSeason.season_number}`;
+                    episodeInfo.textContent = `Серия: ${selectedEpisode.episode_number}`;
+                });
+
+                seasonSelect.dispatchEvent(new Event('change'));
+            } else {
+                seriesInfo.style.display = 'none';
+                seriesSelectorContainer.style.display = 'none';
+            }
+
+            restartAnimation(previewBlock, 'fade-in-right');
+            restartAnimation(previewTitle, 'fade-in-right');
+            restartAnimation(previewDesc, 'fade-in-right');
+        }, 500); // Wait for the fade-out animation to complete (0.5s)
+
+        // Optionally, you can adjust the duration in milliseconds to match your CSS animation duration
+    }
+
+    // Fetch a random movie from the server
+    function fetchRandomMovie() {
+        fetch("{% url 'get_random_movie' %}")
+            .then(response => response.json())
+            .then(data => updatePreviewBlock(data))
+            .catch(error => console.error('Error fetching random movie:', error));
+    }
+
+    // Auto-switch between movies
+    function startAutoSwitching() {
+        intervalId = setInterval(fetchRandomMovie, 10000);
+    }
+
+    // Stop auto-switching
+    function stopAutoSwitching() {
+        clearInterval(intervalId);
+    }
+
+    // Add event listeners for the buttons
+    previewTrailerBtn.addEventListener('click', function() {
+        document.getElementById('trailer-popup').style.display = 'block';
+        stopAutoSwitching();
+    });
+
+    previewFilmBtn.addEventListener('click', function() {
+        document.getElementById('film-popup').style.display = 'block';
+        stopAutoSwitching();
+    });
+
+    // Close buttons for the popups
+    document.querySelector('#trailer-popup .close').addEventListener('click', function() {
+        document.getElementById('trailer-popup').style.display = 'none';
+        startAutoSwitching();
+    });
+
+    document.querySelector('#film-popup .close').addEventListener('click', function() {
+        document.getElementById('film-popup').style.display = 'none';
+        startAutoSwitching();
+    });
+
+    // Initial data setup
+    updatePreviewBlock({
+        title: "{{ current_movie.title }}",
+        description: "{{ current_movie.description|truncatewords:60 }}",
+        preview_poster: "{{ current_movie.preview_poster.url }}",
+        trailer_url: "{{ trailer_url }}",
+        movie_url: "{% if current_movie.movie_file %}{{ current_movie.movie_file.url }}{% endif %}",
+        is_series: {{ current_movie.is_series|yesno:"true,false" }},
+        seasons: [
+            {% for season in current_movie.seasons.all %}
+            {
+                season_number: {{ season.season_number }},
+                episodes: [
+                    {% for episode in season.episodes.all %}
+                    {
+                        episode_number: {{ episode.episode_number }},
+                        video_url: "{{ episode.video.url }}"
+                    }
+                    {% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ]
+            }
+            {% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    });
+
+    startAutoSwitching();
+});
+
+
+
+</script>
+
+
+
+{% endblock %}

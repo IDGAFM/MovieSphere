@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="main-title">
+        Профиль
+    </div>
+</div>
+
+<div class="container">
+    <div class="block-profile">
+        <div class="save-image" id="save-image">
+            {% if form.photo.value %}
+                <img class="prof-img" src="{{ form.photo.value }}">
+                <div id="image-options-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-popup-modal">&times;</span>
+
+                        <button type="button" id="change-photo">Выбрать новое фото</button>
+                        <button type="button" id="remove-photo">Удалить фото</button>
+                    </div>
+                </div>
+            {% else %}
+                <p id="choose-photo-text">Выбрать фото...</p>
+            {% endif %}
+            <form id="image-upload-form" method="post" action="{% url 'profile_photo_upload' %}" enctype="multipart/form-data" style="display: none;">
+                {% csrf_token %}
+                <input type="file" id="photo" name="photo" accept="image/*">
+                <button type="submit">Upload</button>
+            </form>
+        </div>
+
+        <div class="save-input">
+            <form id="update-profile-form" method="post" action="{% url 'profile' %}">
+                {% csrf_token %}
+                <label for="username">Имя пользователя</label><br>
+                <input type="text" id="username" name="username" value="{{ form.username.value }}" placeholder="ivanovkinolover1999" readonly><br><br>
+
+                <label for="email">Электронный адрес</label><br>
+                <input type="email" id="email" name="email" value="{{ form.email.value }}" placeholder="ivanovkinolover1999@gmail.com" readonly><br><br>
+
+                <label for="phone">Номер телефона</label><br>
+                <input type="tel" id="phone" name="phone" value="{{ form.phone.value }}" placeholder="8 800 800 80 80" readonly><br><br>
+
+                <button type="button" id="edit-profile">Изменить</button><br>
+            </form>
+            <a class="po" href="#">
+                Нажимая «Продолжить», я соглашаюсь <br> с Политикой конфиденциальности <br>и Пользовательским соглашением
+            </a>
+        </div>
+    </div>
+</div>
+<div class="aside-content">
+    <aside class="side-bar">
+        <a href="{% url 'profile' %}"><i class="fa-solid fa-user"></i> Мой профиль</a>
+        <a href="{% url 'favorite_movies' %}"><i class="fa-solid fa-heart"></i> Любимые фильмы</a>
+        <a href="{% url 'watched_movies' %}"><i class="fa-solid fa-eye"></i> Просмотрено</a>
+        <a href="{% url 'planned_movies' %}"><i class="fa-solid fa-calendar"></i> В планах</a>
+        <a href="{% url 'logout' %}"><i class="fa-solid fa-arrow-right-from-bracket"></i> Выйти</a>
+    </aside>
+</div>
+
+<div id="edit-profile-popup" class="popup">
+    <div class="popup-content">
+        <span class="close-popup">&times;</span>
+        <form id="popup-form" method="post" action="{% url 'profile' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="popup-username">Имя пользователя</label><br>
+            <input type="text" id="popup-username" name="username" value="{{ form.username.value }}"><br><br>
+
+            <label for="popup-email">Электронный адрес</label><br>
+            <input type="email" id="popup-email" name="email" value="{{ form.email.value }}"><br><br>
+
+            <label for="popup-phone">Номер телефона</label><br>
+            <input type="tel" id="popup-phone" name="phone" value="{{ form.phone.value }}"><br><br>
+
+            <button type="submit">Сохранить</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const profilePhotoRemoveUrl = "{% url 'profile_photo_remove' %}";
+</script>
+
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'javascript/profile.js' %}"></script>
+<script src="{% static 'javascript/index.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/act.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-actor">
+    <div class="actor-card">
+        <div class="actor-photo">
+            <img src="{{ actor.image.url }}" alt="{{ actor.name }}">
+        </div>
+        <div class="actor-info">
+            <h1>{{ actor.name }}</h1>
+            <p class="actor-role">{{ actor.career }}</p>
+            <div class="actor-details">
+                <h2>О персоне</h2>
+                <p><strong>Карьера:</strong> {{ actor.career }}</p>
+                <p><strong>Рост:</strong> {{ actor.height }} м</p>
+                <p><strong>Дата рождения:</strong> {{ actor.birth_date|date:"d M, Y" }} - {{ actor.age }} лет</p>
+                <p><strong>Место рождения:</strong> {{ actor.birth_place }}</p>
+                <p><strong>Жанры:</strong> {{ actor.genres.all|join:", " }}</p>
+                <p><strong>Всего фильмов:</strong> {{ actor.movies_count }}</p>
+            </div>
+            <div class="popular-movies">
+                <h2>Популярное сейчас</h2>
+                {% for movie in popular_movies %}
+                <div class="movie">
+                    <img src="{{ movie.poster.url }}" alt="{{ movie.title }}">
+                    <p>{{ movie.title }}</p>
+                    <p>{{ movie.year }}, {{ movie.genre.all|join:", " }}</p>
+                    <span class="rating">{{ movie.average_rating }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

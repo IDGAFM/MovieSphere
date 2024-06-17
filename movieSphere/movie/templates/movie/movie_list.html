@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/movies.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container-two">
+        <div class="main-title">
+            {{ page_title }}
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="big-block">
+
+            <div class="block-filter">
+                <div class="filter-genre">
+                    <h3>Жанры</h3>
+                        <form id="genreForm" method="get" action="{% url 'movies' %}">
+                            <input type="hidden" name="category" value="{{ category }}">
+                            <input type="hidden" name="q" value="{{ query }}">
+                            {% for genre in first_five_genres %}
+                            <input type="checkbox" id="{{ genre.url }}" name="genre" value="{{ genre.name }}" {% if genre.name in request.GET.genre %}checked{% endif %}>
+                            <label for="{{ genre.url }}">{{ genre.name }}</label><br>
+                            {% endfor %}
+                        </form>
+                    <div class="more-genre">
+                        <button type="button" id="showGenrePopup">Больше...</button>
+                    </div>
+                </div>
+
+                <div class="filter-year">
+                    <h3>Год</h3>
+                        <form id="yearForm" method="get" action="{% url 'movies' %}">
+                            <input type="hidden" name="category" value="{{ category }}">
+                            <input type="hidden" name="q" value="{{ query }}">
+                            {% for year in first_five_years %}
+                            <input type="checkbox" id="year{{ year }}" name="year" value="{{ year }}" {% if year|stringformat:"s" in request.GET.year %}checked{% endif %}>
+                            <label for="year{{ year }}">{{ year }}</label><br>
+                            {% endfor %}
+                        </form>
+                    <div class="more-genre">
+                        <button type="button" id="showYearPopup">Больше...</button>
+                    </div>
+                </div>
+
+
+                <div class="complete-btn">
+                    <button id="applyFilterBtn">Применить</button>
+                </div>
+            </div>
+
+            <div class="block-film">
+                {% if movies %}
+                    {% for movie in movies %}
+                        <div class="popularity-images">
+                            <a href="{{ movie.get_absolute_url }}">
+                                <img src="{{ movie.poster.url }}" alt="">
+                            </a>
+
+                            <div class="popularity-title">
+                                <div class="popul-film-title">
+                                    <a href="#">
+                                        {{ movie.title }}
+                                    </a>
+                                </div>
+
+                                <div class="popul-janre">
+                                    {% for genre in movie.genre.all %}
+                                        <li>{{ genre.name }}</li>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="popul-year">
+                                    {{ movie.year }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% elif request.GET.q %}
+                    <p>Данного фильма нет.</p>
+                {% endif %}
+            </div>
+
+        </div>
+<ul class="pagination">
+    {% for page in page_obj.paginator.page_range %}
+        <li class="{% if page_obj.number == page %}active{% endif %}">
+            <a href="?page={{ page }}&{{ query_params.urlencode }}">{{ page }}</a>
+        </li>
+    {% endfor %}
+</ul>
+
+
+
+    </div>
+
+<div class="popup-movie" id="genrePopup">
+    <div class="popup-movie-content">
+        <span class="close-tr" onclick="closePopup('genrePopup')">×</span>
+        <h3>Жанры</h3>
+        <form id="moreGenreForm" method="get" action="{% url 'movies' %}">
+            <input type="hidden" name="category" value="{{ category }}">
+            <input type="hidden" name="q" value="{{ query }}">
+            {% for genre in remaining_genres %}
+            <input type="checkbox" id="popup-genre-{{ genre.url }}" name="genre" value="{{ genre.name }}" {% if genre.name in request.GET.genre %}checked{% endif %}>
+            <label for="popup-genre-{{ genre.url }}">{{ genre.name }}</label><br>
+            {% endfor %}
+        </form>
+        <div class="popup-btn-sub">
+            <button type="button" id="applyGenre">Применить</button>
+        </div>
+    </div>
+</div>
+
+<div class="popup-movie" id="yearPopup">
+    <div class="popup-movie-content">
+        <span class="close-tr" onclick="closePopup('yearPopup')">×</span>
+        <h3>Год</h3>
+        <form id="moreYearForm" method="get" action="{% url 'movies' %}">
+            <input type="hidden" name="category" value="{{ category }}">
+            <input type="hidden" name="q" value="{{ query }}">
+            {% for year in remaining_years %}
+            <input type="checkbox" id="popup-year{{ year }}" name="year" value="{{ year }}" {% if year|stringformat:"s" in request.GET.year %}checked{% endif %}>
+            <label for="popup-year{{ year }}">{{ year }}</label><br>
+            {% endfor %}
+        </form>
+        <div class="popup-btn-sub">
+            <button type="button" id="applyYear">Применить</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'javascript/movies.js' %}"></script>
+<script>
+document.getElementById('applyFilterBtn').addEventListener('click', function() {
+    applyFilters();
+});
+
+document.getElementById('applyGenre').addEventListener('click', function() {
+    closePopup('genrePopup');
+    applyFilters();
+});
+
+document.getElementById('applyYear').addEventListener('click', function() {
+    closePopup('yearPopup');
+    applyFilters();
+});
+
+document.getElementById('showGenrePopup').addEventListener('click', function() {
+    openPopup('genrePopup');
+});
+
+document.getElementById('showYearPopup').addEventListener('click', function() {
+    openPopup('yearPopup');
+});
+
+function applyFilters() {
+    var genreForm = document.getElementById('genreForm');
+    var yearForm = document.getElementById('yearForm');
+    var moreGenreForm = document.getElementById('moreGenreForm');
+    var moreYearForm = document.getElementById('moreYearForm');
+    var queryString = '';
+
+    var genreCheckboxes = genreForm.querySelectorAll('input[type="checkbox"]:checked');
+    var moreGenreCheckboxes = moreGenreForm.querySelectorAll('input[type="checkbox"]:checked');
+
+    genreCheckboxes.forEach(function(checkbox) {
+        queryString += 'genre=' + encodeURIComponent(checkbox.value) + '&';
+    });
+    moreGenreCheckboxes.forEach(function(checkbox) {
+        if (!queryString.includes('genre=' + encodeURIComponent(checkbox.value))) {
+            queryString += 'genre=' + encodeURIComponent(checkbox.value) + '&';
+        }
+    });
+
+    var yearCheckboxes = yearForm.querySelectorAll('input[type="checkbox"]:checked');
+    var moreYearCheckboxes = moreYearForm.querySelectorAll('input[type="checkbox"]:checked');
+
+    yearCheckboxes.forEach(function(checkbox) {
+        queryString += 'year=' + encodeURIComponent(checkbox.value) + '&';
+    });
+    moreYearCheckboxes.forEach(function(checkbox) {
+        if (!queryString.includes('year=' + encodeURIComponent(checkbox.value))) {
+            queryString += 'year=' + encodeURIComponent(checkbox.value) + '&';
+        }
+    });
+
+    queryString += 'category=' + encodeURIComponent(document.querySelector('input[name="category"]').value) + '&';
+    queryString += 'q=' + encodeURIComponent(document.querySelector('input[name="q"]').value);
+
+    queryString = queryString.replace(/&$/, '');
+
+    var url = genreForm.getAttribute('action') + '?' + queryString;
+
+    window.location.href = url;
+}
+
+function openPopup(popupId) {
+    document.getElementById(popupId).style.display = 'block';
+}
+
+function closePopup(popupId) {
+    document.getElementById(popupId).style.display = 'none';
+}
+
+
+
+</script>
+
+
+{% endblock %}

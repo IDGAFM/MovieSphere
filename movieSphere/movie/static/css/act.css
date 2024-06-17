@@ -1,0 +1,207 @@
+/* act.css */
+.container-actor {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    margin-top: 100px;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.actor-card {
+    width: 100%;
+    max-width: 1200px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.actor-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.actor-photo img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    display: block;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+.actor-info {
+    margin-left: 20px;
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.actor-info h1 {
+    margin: 0;
+    font-size: 2em;
+    color: #333;
+}
+
+.actor-role {
+    color: #666;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+.favorite-btn {
+    background-color: #ff4757;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    width: 200px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.favorite-btn:hover {
+    background-color: #e84118;
+}
+
+.actor-details h2 {
+    margin-top: 20px;
+    font-size: 1.5em;
+    border-bottom: 2px solid #ff4757;
+    display: inline-block;
+    color: #333;
+}
+
+.actor-details p {
+    margin: 10px 0;
+    color: #555;
+}
+
+.popular-movies {
+    margin-top: 20px;
+}
+
+.popular-movies h2 {
+    font-size: 1.5em;
+    border-bottom: 2px solid #ff4757;
+    display: inline-block;
+    color: #333;
+}
+
+.movie {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.movie:hover {
+    background-color: #ffefef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.movie img {
+    width: 50px;
+    height: 75px;
+    margin-right: 10px;
+    border-radius: 5px;
+}
+
+.movie p {
+    margin: 0;
+    flex: 1;
+    color: #333;
+}
+
+.rating {
+    background-color: #ff4757;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+/* Media Query for screens with max width of 500px */
+@media (max-width: 500px) {
+    .container-actor {
+        flex-direction: column;
+        margin-top: 20px;
+        align-items: stretch;
+    }
+
+    .actor-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .actor-photo img {
+        width: 80%;
+        margin: 0 auto;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .actor-info {
+        margin: 0;
+        padding: 10px;
+    }
+
+    .actor-info h1 {
+        font-size: 1.5em;
+    }
+
+    .actor-role {
+        font-size: 1em;
+
+    }
+
+    .favorite-btn {
+        width: 100%;
+        padding: 10px 0;
+    }
+
+    .actor-details h2, .popular-movies h2 {
+        font-size: 1.2em;
+    }
+
+    .actor-details p {
+        display: flex;
+        font-size: 0.9em;
+    }
+
+    .movie {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .movie img {
+        margin-top: 10px;
+        width: 100px;
+        height: 150px;
+        margin-bottom: 10px;
+    }
+
+    .movie p {
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    .rating {
+        margin-top: 10px;
+        width: 20%;
+        padding: 5px 0;
+    }
+}

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/actor_list.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container-lis">
+    <h1>{{ movie.title }} - Актеры</h1>
+
+    <form method="GET" action=".">
+        <input class="c" type="text" name="search" placeholder="Search actors..." value="{{ request.GET.search }}">
+        <button type="submit">Search</button>
+    </form>
+
+    <div class="actor-list">
+        {% for actor in actors %}
+            <div class="actor-item">
+                <a href="{{ actor.get_absolute_url }}">
+                    <img src="{{ actor.image.url }}" alt="{{ actor.name }}">
+                    {{ actor.name }}
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="pagination">
+        {% if is_paginated %}
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li><a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Previous</a></li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li><strong>{{ num }}</strong></li>
+                    {% elif num > page_obj.number|add:-5 and num < page_obj.number|add:5 %}
+                        <li><a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li><a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Next</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'javascript/index.js' %}"></script>
+{% endblock %}

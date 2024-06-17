@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/popularity.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="main-title">
+            Популярно сейчас
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="popularity">
+            {% for movie in page_obj.object_list %}
+                <div class="popularity-info">
+                    <div class="popularity-images">
+                        <a href="{{ movie.get_absolute_url }}">
+                            <img src="{{ movie.poster.url }}" alt="{{ movie.title }}">
+                        </a>
+                        <div class="popularity-title">
+                            <div class="popul-film-title">
+                                <a href="{{ movie.get_absolute_url }}">
+                                    {{ movie.title }}
+                                </a>
+                            </div>
+                            <div class="popul-janre">
+                                {% for genre in movie.genre.all %}
+                                    {{ genre.name }} <br>
+                                {% endfor %}
+                            </div>
+                            <div class="popul-year">
+                                {{ movie.year }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="popularity-desc">
+                        {{ movie.description }}
+                    </div>
+                    <div class="popularity-rating">
+                        <div class="rating-num">
+                            {{ movie.average_rating }}
+                        </div>
+                        <div class="rating-quantity">
+                            {{ movie.rating_set.count }} Оценок
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="pagination">
+            {% if is_paginated %}
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <li><a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Previous</a></li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li><strong>{{ num }}</strong></li>
+                        {% elif num > page_obj.number|add:-5 and num < page_obj.number|add:5 %}
+                            <li><a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li><a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Next</a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

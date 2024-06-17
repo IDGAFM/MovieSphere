@@ -1,0 +1,29 @@
+<div class="review-two">
+    {% for review in reviews %}
+        <div class="review-people">
+            <div class="img-people"></div>
+            <div class="email-text">
+                <div class="email">{{ review.email }}</div>
+                <div class="review-text">{{ review.text }}</div>
+                <a href="#" class="reply-link" data-email="{{ review.email }}" data-id="{{ review.id }}">Ответить</a>
+            </div>
+            {% if review.id in review_replies %}
+                <div class="replies-container">
+                    {% for reply in review_replies|dictsort:"review.id" %}
+                        <div class="reply review-people">
+                            <div class="img-people"></div>
+                            <div class="email-text">
+                                <div class="email">{{ reply.email }}</div>
+                                <div class="review-text">{{ reply.text }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    {% empty %}
+        <div class="review-people">
+            <p>Пока нет отзывов.</p>
+        </div>
+    {% endfor %}
+</div>

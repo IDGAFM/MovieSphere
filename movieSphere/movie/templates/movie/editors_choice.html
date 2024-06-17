@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/editors_choice.css' %}">
+
+{% endblock %}
+
+{% block content %}
+<div class="container-red">
+
+    <h1>Выбор редакции</h1>
+    <div class="editors-choice-grid">
+        {% for movie in editors_choice_movies %}
+
+        <div class="editors-choice-item">
+
+            <a href="{{ movie.get_absolute_url }}">
+                <img src="{{ movie.poster.url }}" alt="{{ movie.title }}">
+                <h2>{{ movie.title }}</h2>
+            </a>
+            <p class="des">{{ movie.description|truncatewords:40 }}</p>
+            <p><strong>Рейтинг:</strong> {{ movie.average_rating }}</p>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'javascript/editors_choice.js' %}"></script>
+{% endblock %}

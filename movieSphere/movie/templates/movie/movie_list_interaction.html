@@ -1,0 +1,119 @@
+<!-- movie_list_interaction.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/inter.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-two">
+    <div class="main-title">
+        {{ page_title }}
+    </div>
+</div>
+
+<div class="container">
+    <div class="aside-content">
+    <aside class="side-bar">
+        <a href="{% url 'profile' %}"><i class="fa-solid fa-user"></i> Мой профиль</a>
+        <a href="{% url 'favorite_movies' %}"><i class="fa-solid fa-heart"></i> Любимые фильмы</a>
+        <a href="{% url 'watched_movies' %}"><i class="fa-solid fa-eye"></i> Просмотрено</a>
+        <a href="{% url 'planned_movies' %}"><i class="fa-solid fa-calendar"></i> В планах</a>
+        <a href="{% url 'logout' %}"><i class="fa-solid fa-arrow-right-from-bracket"></i> Выйти</a>
+    </aside>
+    </div>
+
+    <div class="big-block">
+
+
+        <div class="block-film">
+            {% if movies %}
+                {% for movie in movies %}
+                    <div class="popularity-images">
+                        <a href="{{ movie.get_absolute_url }}">
+                            <img src="{{ movie.poster.url }}" alt="">
+                        </a>
+
+                        <div class="popularity-title">
+                            <div class="popul-film-title">
+                                <a href="#">
+                                    {{ movie.title }}
+                                </a>
+                            </div>
+
+                            <div class="popul-janre">
+                                {% for genre in movie.genre.all %}
+                                    <li>{{ genre.name }}</li>
+                                {% endfor %}
+                            </div>
+
+                            <div class="popul-year">
+                                {{ movie.year }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% elif request.GET.q %}
+                <p>Данного фильма нет.</p>
+            {% endif %}
+
+        </div>
+
+    </div>
+        <div class="pagination">
+            {% if is_paginated %}
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <li><a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Previous</a></li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li><strong>{{ num }}</strong></li>
+                        {% elif num > page_obj.number|add:-5 and num < page_obj.number|add:5 %}
+                            <li><a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li><a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Next</a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}
+        </div>
+
+</div>
+
+
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'javascript/movies.js' %}"></script>
+<script>
+document.getElementById('applyFilterBtn').addEventListener('click', function() {
+    var genreForm = document.getElementById('genreForm');
+    var yearForm = document.getElementById('yearForm');
+    var queryString = '';
+
+    var genreCheckboxes = genreForm.querySelectorAll('input[type="checkbox"]:checked');
+    genreCheckboxes.forEach(function(checkbox) {
+        queryString += 'genre=' + encodeURIComponent(checkbox.value) + '&';
+    });
+
+    var yearCheckboxes = yearForm.querySelectorAll('input[type="checkbox"]:checked');
+    yearCheckboxes.forEach(function(checkbox) {
+        queryString += 'year=' + encodeURIComponent(checkbox.value) + '&';
+    });
+
+    queryString += 'category=' + encodeURIComponent(document.querySelector('input[name="category"]').value) + '&';
+    queryString += 'q=' + encodeURIComponent(document.querySelector('input[name="q"]').value);
+
+    queryString = queryString.replace(/&$/, '');
+
+    var url = genreForm.getAttribute('action') + '?' + queryString;
+
+    window.location.href = url;
+});
+</script>
+{% endblock %}

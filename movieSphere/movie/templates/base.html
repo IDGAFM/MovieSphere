@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abel&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    {% block css %}{% endblock %}
+    <title>Фильмы</title>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="head-items">
+                <div class="burger-menu">
+                    <button id="burger">
+                        <img class="burger-img" src="{% static 'images/burger-menu.png' %}" alt="">
+                    </button>
+                    <div id="b-menu" class="burger-slide disp">
+                        <button class="close-btn" onclick="closeMenu()">&#10006;</button>
+                        <a class="nav-item-burger block" id="logo-burger" href="{% url 'home' %}">Movie Sphere</a>
+                        <a class="nav-item-burger block" href="{% url 'movies' %}?category=movies">Фильмы</a>
+                        <a class="nav-item-burger block" href="{% url 'movies' %}?category=serials">Сериалы</a>
+                        <a class="nav-item-burger block" href="{% url 'movies' %}?category=cartoons">Мультфильмы</a>
+                        {% if user.is_authenticated %}
+                        <a class="nav-item-burger block" id="profile" href="{% url 'profile' %}">Профиль</a>
+
+                        {% else %}
+                            <a class="nav-item-burger block" id="sign_in_burger" href="#">Вход</a>
+                            <a class="nav-item-burger block" id="sign_up_burger" href="#">Регистрация</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="block-logo-nav">
+                    <div class="logo-head">
+                        <a href="{% url 'home' %}">Movie Sphere</a>
+                    </div>
+                    <div class="nav-items">
+                        <a href="{% url 'movies' %}?category=movies">Фильмы</a>
+                        <a href="{% url 'movies' %}?category=serials">Сериалы</a>
+                        <a href="{% url 'movies' %}?category=cartoons">Мультфильмы</a>
+                    </div>
+                </div>
+                <div class="block-search-login">
+                    <div class="search">
+                    <form action="{% url 'movie_search' %}" method="get">
+                        <input type="text" name="q" placeholder="Поиск...">
+
+                    </form>
+
+                        <button type="submit">
+                            <img class="search-img" src="{% static 'images/search.png' %}" alt="">
+                        </button>
+                    </div>
+                    {% if user.is_authenticated %}
+                        <div class="profile-image">
+                            <a href="{% url 'profile' %}">
+                                {% if user.profile.photo %}
+                                    <img src="{{ user.profile.photo.url }}" alt="{{ user.profile.username }}">
+                                {% else %}
+                                    <img class="profile-def" src="{% static 'images/profile.png' %}" alt="Default Profile Picture">
+                                {% endif %}
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="login-reg">
+                            <a href="#" id="sign_in">Вход</a>
+                            |
+                            <a href="#" id="sign_up">Регистрация</a>
+                        </div>
+                    {% endif %}
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="popup" id="login-popup">
+    <div class="popup-content">
+        <span class="close-tr" onclick="closePopup('login-popup')">×</span>
+        <h2>Вход</h2>
+        <form id="login-form" method="post" action="{% url 'ajax_login' %}">
+            {% csrf_token %}
+            <input type="text" id="login-username" name="username" placeholder="Username" required>
+            <input type="password" id="login-password" name="password" placeholder="Пароль" required>
+            <button type="submit">Войти</button>
+        </form>
+    </div>
+</div>
+
+<div class="popup" id="register-popup">
+    <div class="popup-content">
+        <span class="close-tr" onclick="closePopup('register-popup')">×</span>
+        <h2>Регистрация</h2>
+        <form id="register-form" method="post" action="{% url 'ajax_register' %}">
+            {% csrf_token %}
+            <input type="email" id="email" name="email" placeholder="Email" required>
+            <input type="password" id="password1" name="password1" placeholder="Пароль" required>
+            <input type="password" id="password2" name="password2" placeholder="Повторите пароль" required>
+            <input type="text" id="username" name="username" placeholder="Имя пользователя" required>
+            <input type="text" id="phone" name="phone" placeholder="Телефон" required>
+            <button type="submit">Продолжить</button>
+        </form>
+    </div>
+</div>
+
+
+    {% block content %}{% endblock %}
+    <div class="footer">
+        <div class="container">
+            <div class="separator"></div>
+            <div class="footer-block">
+                <div class="footer-link">
+                    <a href="#">
+                        Пользовательское соглашение<br>
+                        Правообладателям <br>
+                        Справка
+                    </a>
+                </div>
+                <div class="social-images">
+                    <div class="vk">
+                        <a href="#">
+                            <img src="{% static 'images/vk.png' %}" alt="">
+                        </a>
+                    </div>
+                    <div class="insta">
+                        <a href="#">
+                            <img src="{% static 'images/insta.png' %}" alt="">
+                        </a>
+                    </div>
+                    <div class="telega">
+                        <a href="#">
+                            <img src="{% static 'images/telegram.png' %}" alt="">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% block js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'javascript/index.js' %}"></script>
+
+<script>
+    $('#register-form').submit(function(event) {
+    event.preventDefault();
+    var formData = $(this).serialize();
+    $.ajax({
+        type: 'POST',
+        url: '/ajax/register/',
+        data: formData, // Данные формы
+        success: function(response) {
+            if (response.success) {
+                console.log(response.message);
+                window.location.href = '/profile/';
+            } else {
+                console.error(response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+        }
+            });
+        });
+
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    $('#login-form').submit(function(event) {
+        event.preventDefault();
+        var formData = $(this).serialize();
+        $.ajax({
+            type: 'POST',
+            url: '{% url "ajax_login" %}',
+            data: formData, // Данные формы
+            headers: {
+                'X-CSRFToken': getCSRFToken() // Добавляем CSRF-токен в заголовок
+            },
+            success: function(response) {
+                if (response.success) {
+                    console.log(response.message);
+                    window.location.href = response.redirect_url;
+                } else {
+                    console.error(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
+    });
+
+</script>
+{% endblock %}
+</body>
+</html>
